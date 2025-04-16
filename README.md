@@ -13,7 +13,7 @@ This document provides an overview of the QEMU/KVM test lab environment provisio
 
 **Architecture Diagram:**
 
-![Architecture Overview](images/overview.jpg)
+![Architecture Overview](Images/overview.jpg)
 
 ## 2. Terraform Infrastructure (`provisioning/terraform/`)
 
@@ -139,10 +139,3 @@ This file defines which classes are applied to nodes:
 ### Hiera Data
 
 Hiera (`hiera.yaml`, `data/common.yaml`) is likely used to provide parameters to the Puppet classes, allowing for customization without modifying the module code directly. The specific contents of `common.yaml` were not reviewed.
-
-## 5. Identified Discrepancies & Considerations
-
-*   **Domain Name Mismatch:** Terraform configurations use `${var.domain_name}` (likely defaulting to or intended as `test.lab` based on Cloud-Init scripts and variable descriptions) for VM hostnames. However, `site.pp` uses explicit `grasslake.local` domain names in its node definitions. This mismatch will prevent Puppet from applying the specific configurations for Kubernetes and HAProxy nodes unless the Terraform `domain_name` variable is set to `grasslake.local` or the `site.pp` node definitions are updated to use the correct domain and hostname patterns (e.g., `/^kcontrol\d+\.test\.lab$/`).
-*   **Missing Puppet Node Definitions:** The `site.pp` manifest lacks specific `node` blocks for `puppet`, `freeipa`, `prometheus`, `grafana`, and `openvpn` servers. These nodes will receive only the classes defined in the `node default` block. The mechanism for applying their core application configurations (e.g., Prometheus scrape targets, Grafana data sources, OpenVPN server setup, Puppet server tuning) is not defined within the reviewed `site.pp` and might be handled by modules included in `node default` (less likely for such specific configs), missing entirely, or intended to be done manually.
-*   **Potentially Outdated `site.pp`:** The `site.pp` includes node definitions for `docker*.grasslake.local`, but the reviewed Terraform files do not contain resources to create these specific VMs. This section of `site.pp` might be outdated or relate to unreviewed infrastructure definitions.
-*   **Hardcoded Values:** The Cloud-Init scripts consistently use hardcoded values for the FreeIPA domain (`test.lab`), realm (`TEST.LAB`), and the principal/password (`admin`/`testlabs`) when running `ipa-client-install`. These should ideally be parameterized using Terraform variables for better security and flexibility. Similarly, the Puppet Server FQDN (`puppet.test.lab`) is hardcoded in the `nc` check within Cloud-Init scripts.

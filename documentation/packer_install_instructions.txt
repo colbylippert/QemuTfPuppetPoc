@@ -1,0 +1,12 @@
+1. Add the HashiCorp GPG key
+============================
+This should have been done when installing terraform
+
+2.Add the HashiCorp Linux Repo
+=============================
+This should also have been completed with terraform installation
+
+
+3. Update and Install
+====================
+sudo apt-get update && sudo apt-get install packer

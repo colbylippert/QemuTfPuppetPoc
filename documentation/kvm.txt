@@ -1,0 +1,53 @@
+Install KVM:
+============
+sudo pacman -S qemu libvirt edk2-ovmf virt-manager dnsmasq iptables-nft
+sudo systemctl enable libvirtd
+sudo systemctl start libvirtd
+sudo usermod -aG libvirt $(whoami)
+sudo virsh net-start default
+sudo virsh net-autostart default
+sudo modprobe kvm
+sudo modprobe kvm_intel
+sudo lsmod | grep kvm
+virt-manager
+
+Enable Network Bridge:
+======================
+
+Specify proper network interface in the following: enp7s0
+
+sudo pacman -S bridge-utils
+sudo ip link add name br0 type bridge
+sudo ip link set br0 up
+sudo ip link set enp7s0 master br0
+sudo dhclient br0
+sudo nano /etc/systemd/network/bridge-br0.netdev
+	[NetDev]
+	Name=br0
+	Kind=bridge
+sudo nano /etc/systemd/network/br0.network
+	[Match]
+	Name=br0
+	[Network]
+	DHCP=no
+sudo nano /etc/systemd/network/enp7s0.network
+	[Match]
+	Name=enp7s0
+	[Network]
+	Bridge=br0
+sudo systemctl enable systemd-networkd
+sudo systemctl start systemd-networkd
+sudo nano /etc/libvirt/qemu/networks/bridge.xml
+	<network>
+	  <name>br0</name>
+	  <forward mode='bridge'/>
+	  <bridge name='br0'/>
+	</network>
+sudo virsh net-define /etc/libvirt/qemu/networks/bridge.xml
+sudo virsh net-start br0
+sudo virsh net-autostart br0
+
+Commands:
+=========
+virsh -c qemu:///system list --all
+virsh -c qemu:///system dumpxml centos-stream9

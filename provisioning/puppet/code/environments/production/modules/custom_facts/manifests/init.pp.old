@@ -1,0 +1,9 @@
+class custom_facts {
+  file { '/opt/puppetlabs/facter/facts.d/home_directories.rb':
+    ensure  => file,
+    mode    => '0755',
+    owner   => 'root',
+    group   => 'root',
+    content => "#!/opt/puppetlabs/puppet/bin/ruby\nrequire 'facter'\nFacter.add(:home_directories) do\n\n  setcode do\n  Facter.info('asdf2')\n  Facter.warn('asdf')\n    'test_string=5'\n  end\nend\n",
+  }
+}

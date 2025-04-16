@@ -1,0 +1,68 @@
+{
+  "name": "puppet-firewalld",
+  "version": "5.0.0",
+  "author": "Vox Pupuli",
+  "summary": "Configure firewalld zones, services, and rich rules and direct config",
+  "license": "Apache-2.0",
+  "tags": [
+    "firewalld",
+    "firewall",
+    "rhel",
+    "security",
+    "iptables",
+    "nftables"
+  ],
+  "requirements": [
+    {
+      "name": "puppet",
+      "version_requirement": ">= 7.0.0 < 9.0.0"
+    }
+  ],
+  "operatingsystem_support": [
+    {
+      "operatingsystem": "RedHat",
+      "operatingsystemrelease": [
+        "7",
+        "8",
+        "9"
+      ]
+    },
+    {
+      "operatingsystem": "AlmaLinux",
+      "operatingsystemrelease": [
+        "8",
+        "9"
+      ]
+    },
+    {
+      "operatingsystem": "CentOS",
+      "operatingsystemrelease": [
+        "7",
+        "8",
+        "9"
+      ]
+    },
+    {
+      "operatingsystem": "Rocky",
+      "operatingsystemrelease": [
+        "8",
+        "9"
+      ]
+    },
+    {
+      "operatingsystem": "SLES",
+      "operatingsystemrelease": [
+        "15"
+      ]
+    }
+  ],
+  "source": "https://github.com/voxpupuli/puppet-firewalld",
+  "project_page": "https://github.com/voxpupuli/puppet-firewalld",
+  "issues_url": "https://github.com/voxpupuli/puppet-firewalld/issues",
+  "dependencies": [
+    {
+      "name": "puppetlabs/stdlib",
+      "version_requirement": ">= 4.25.0 < 10.0.0"
+    }
+  ]
+}

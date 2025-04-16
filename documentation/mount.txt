@@ -1,0 +1,8 @@
+sudo pacman -S ntfs-3g
+sudo blkid
+sudo mkdir -p /mnt/mydrive
+sudo nano /etc/fstab
+	UUID=your-ntfs-drive-uuid  /mnt/myntfsdrive  ntfs-3g  defaults  0  0
+	/mnt/nvme/vms  /srv/vms none bind 0 0
+	/mnt/nvme/src  /src none bind 0 0
+sudo mount -a

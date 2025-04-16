@@ -1,0 +1,2 @@
+class custom_facts {
+}

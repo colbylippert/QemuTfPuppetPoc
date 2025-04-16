@@ -1,0 +1,50 @@
+class bashrc {
+  # Ensure the alias is present in /etc/skel/.bashrc for new users
+  file_line { 'ls alias in skel':
+    path  => '/etc/skel/.bashrc',
+    line  => "alias ls='ls -al'",
+    match => '^alias ls=',
+    ensure => present,
+  }
+
+  # Ensure the source line is present in /etc/skel/.bash_profile for new users
+  file_line { 'source bashrc in skel bash_profile':
+    path    => '/etc/skel/.bash_profile',
+    line    => 'if [ -f ~/.bashrc ]; then source ~/.bashrc; fi',
+    match   => '^if \[ -f ~/.bashrc \]; then source ~/.bashrc; fi$',
+    ensure  => present,
+  }
+
+  # Assuming $facts['home_directories'] returns an array of directory paths
+  $home_dirs = $facts['home_directories']
+
+  # Iterate over each home directory and apply the alias and bash_profile edit
+  $home_dirs.each |$home_dir| {
+    bashrc::apply { $home_dir:
+      home_dir => $home_dir,
+    }
+  }
+}
+
+define bashrc::apply ($home_dir) {
+  # Notify the current directory being processed
+  notify { "Applying configurations to ${home_dir}":
+    message => "Processing ${home_dir}/.bashrc and ${home_dir}/.bash_profile"
+  }
+
+  # Ensure the alias is present in each user's .bashrc file
+  file_line { "alias_in_${home_dir}_bashrc":
+    path  => "${home_dir}/.bashrc",
+    line  => "alias ls='ls -al'",
+    match => '^alias ls=',
+    ensure => present,
+  }
+
+  # Ensure that .bash_profile sources .bashrc
+  file_line { "source_bashrc_in_${home_dir}_bash_profile":
+    path  => "${home_dir}/.bash_profile",
+    line  => 'if [ -f ~/.bashrc ]; then source ~/.bashrc; fi',
+    match => '^if \[ -f ~/.bashrc \]; then source ~/.bashrc; fi$',
+    ensure => present,
+  }
+}

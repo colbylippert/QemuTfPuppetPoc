@@ -1,0 +1,21 @@
+Overview
+========
+
+SELinux is enforced by QEMU on Ubuntu distros even when disabled globally. 
+This leads to the following error : "unexpected Could not open '/var/lib/libvirt/images/<FILE_NAME>': Permission denied".
+
+Fix
+===
+
+sudo nano /etc/libvirt/qemu.conf
+set security_driver=none
+uncomment security_driver
+ctrl+s ctrl+x
+sudo systemctl restart libvirtd
+
+Summary
+=======
+
+SELinux is enforced even when disabled globally on Ubunutu Distros which denies file permissions KVM needs to run.
+
+Uncommenting "security_driver" and setting it to none in the qemu.conf, then restarting libvirtd, fixes this. 

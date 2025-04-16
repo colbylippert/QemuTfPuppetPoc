@@ -1,0 +1,41 @@
+Terraform Install:
+==================
+<create /src directory off root>
+cd /src
+sudo pacman -S --needed base-devel git
+git clone https://aur.archlinux.org/yay.git
+chmod -R colbyl:colbyl /yay
+cd yay
+makepkg -si
+yay -S terraform
+terraform version
+
+Terraform create ISO pool:
+==========================                   
+cd /srv/vms
+sudo mkdir iso_pool
+sudo chown libvirt-qemu:kvm iso_pool/
+sudo chmod 770 /srv/vms/kvm/iso_pool
+cd iso_pool
+sudo nano iso_pool.xml
+
+<pool type='dir'>
+  <name>iso_pool</name>
+  <target>
+    <path>/srv/vms/iso_pool</path>
+  </target>
+</pool>
+
+sudo virsh pool-define iso_pool.xml
+sudo virsh pool-build iso_pool
+sudo virsh pool-start iso_pool
+sudo virsh pool-autostart iso_pool
+sudo ln -s /mnt/nvme/vms/iso/CentOS-Stream-9-latest-x86_64-dvd1.iso /srv/vms/kvm/iso_pool/CentOS-Stream-9.iso
+sudo virsh pool-list --all
+
+Terraform Test:
+===============
+cd /src/testlab/terraform
+terraform init
+terraform apply
+terraform destroy

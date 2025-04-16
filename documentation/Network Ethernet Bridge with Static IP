@@ -1,0 +1,62 @@
+Step-by-Step Guide to Configure Static IP for Bridge br0
+========================================================
+
+Step 1: Remove Existing Configurations
+======================================
+
+  First, let's clean up any existing configurations:
+
+sudo nmcli connection delete br0                         #make sure to replace br0 and eth0 with your device names
+sudo nmcli connection delete eth0                        # use command "ip a" to get network details and device names  
+
+Step 2: Create the Bridge and Enslave the Ethernet Interface
+============================================================
+   
+  Create a new bridge connection named br0:
+
+sudo nmcli connection add type bridge con-name br0 ifname br0
+
+  Add your Ethernet interface (eth0) to the bridge:
+
+sudo nmcli connection add type ethernet slave-type bridge con-name br0-port ifname eth0 master br0
+
+Step 3: Configure the Bridge with a Static IP
+=============================================
+
+    Set the bridge to use a static IP address:
+
+sudo nmcli connection modify br0 ipv4.method manual ipv4.addresses 10.0.0.252/24 ipv4.gateway 10.0.0.1 ipv4.dns "8.8.8.8 8.8.4.4"     # replace ipv4 address with desired static ip and gateway,  replace 8.8.8.8 and 8.8.4.4 with your desired DNS server
+sudo nmcli connection modify br0 ipv6.method disabled
+
+Step 4: Activate the Bridge
+===========================
+
+    Bring up the bridge connection:
+
+sudo nmcli connection up br0
+
+    Bring up the enslaved Ethernet interface (if it isn’t brought up automatically):
+
+sudo nmcli connection up br0-port
+
+    Restart networking services
+
+sudo systemctl restart networking
+
+Verification Steps
+==================
+    Check the active connections:
+
+nmcli connection show
+
+     Ensure that br0 and br0-port are listed and that br0 is active (in green).
+
+    Verify the bridge interface status:
+
+ip addr show br0
+
+    Ensure br0 has the static IP address 10.0.0.252 and is in the UP state.
+
+---------
+
+nmcli device show

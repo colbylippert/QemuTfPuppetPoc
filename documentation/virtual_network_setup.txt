@@ -1,0 +1,12 @@
+sudo virsh net-define /path/to/isolated-net-1.xml
+sudo virsh net-start isolated-net-1
+sudo virsh net-autostart isolated-net-1
+
+sudo virsh net-define /path/to/isolated-net-1.xml
+sudo virsh net-start isolated-net-1
+sudo virsh net-autostart isolated-net-1
+
+sudo virsh net-list --all
+
+sudo virsh net-destroy isolated-net-1
+sudo virsh net-undefine isolated-net-1

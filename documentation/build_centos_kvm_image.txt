@@ -1,0 +1,76 @@
+paste the#########################################################
+##### CentOS Stream 9 Base Image Creation
+#########################################################
+
+Download ISO:
+=============
+cd testlab/provisioning/image
+wget https://download.cf.centos.org/9-stream/BaseOS/x86_64/iso/CentOS-Stream-9-latest-x86_64-dvd1.iso CentOS-Stream-9-latest-x86_64.iso
+
+Install CentOS:
+===============
+ - create dynamically expanding disk:
+
+    qemu-img create -f qcow2 CentOS-Stream-9-latest-x86_64.qcow2 20G
+
+ - open Virtual Machine Manager and create new VM
+ 	- Local install media -> Browse -> Browse Local
+ 	- Select testlab/provisioning/image/CentOS-Stream-9-latest-x86_64.iso
+ 	- Select default memory and CPUs
+ 	- Do not create a disk
+ 	- Finish
+ 	- Configure machine for network access via NAT
+    - Conifugre machine for previously created disk image:
+
+        qcow2 CentOS-Stream-9-latest-x86_64.qcow2
+
+  - Boot and perform installation
+  	- Configure Installation Destination
+  	- Configure Software Selection -> Minimal Install
+  	- Configure User Creation
+  		- Make this user administrator
+  		- username: admin
+  		- password: testlab
+  	- Begin and complete installation
+  - Login as admin
+  - get ip address -> ip a
+  - ssh to address -> ssh admin@<ipaddress>
+
+Boot and generalize for Cloud-Init:
+===================================
+sudo dnf update -y
+sudo dnf install epel-release cloud-init -y
+
+sudo rm -rf /tmp/*
+sudo rm -rf /var/tmp/*
+sudo truncate -s 0 /etc/machine-id
+sudo rm /var/lib/dbus/machine-id
+sudo ln -s /etc/machine-id /var/lib/dbus/machine-id
+sudo rm -f /etc/ssh/ssh_host_*
+sudo dnf clean all
+sudo rm -rf /var/lib/cloud/
+sudo cloud-init clean --logs --seed
+sudo systemctl enable cloud-init
+sudo shutdown -h now
+
+Copy QCOW2 image:
+=================
+
+ - open VM settings and locate path of VirtIO Disk 1:
+
+ 	CentOS-Stream-9-latest-x86_64.qcow2
+
+ - copy image to testlab terraform image directory
+
+ 	sudo cp /srv/vms/kvm/default/CentOS-Stream-9-latest-x86_64.qcow2 /src/testlab/provisioning/terraform/image
+
+  - update /src/testlab/provisioning/terraform/config.tfvars with new path:
+
+  	centos9_image_source_path = "/src/testlab/provisioning/terraform/image/CentOS-Stream-9-latest-x86_64.qcow2"
+
+Cleanup:
+========
+ - delete image creation vm
+ - delete downloaded iso
+
+ 

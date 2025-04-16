@@ -1,0 +1,34 @@
+class bashrc {
+  # Ensure the alias is present in /etc/skel/.bashrc for new users
+  file_line { 'ls alias in skel':
+    path  => '/etc/skel/.bashrc',
+    line  => "alias ls='ls -al'",
+    match => '^alias ls=',
+    ensure => present,
+  }
+
+  # Assuming $facts['home_directories'] returns an array of directory paths
+  $home_dirs = $facts['home_directories']
+
+  # Iterate over each home directory and apply the alias
+  $home_dirs.each |$home_dir| {
+    bashrc::apply { $home_dir:
+      home_dir => $home_dir,
+    }
+  }
+}
+
+define bashrc::apply ($home_dir) {
+  # Debugging: Notify the current directory being processed
+  notify { "Applying alias to ${home_dir}/.bashrc":
+    message => "Processing ${home_dir}/.bashrc"
+  }
+
+  # Ensure the alias is present in each user's .bashrc file
+  file_line { "bashrc_${home_dir}":
+    path  => "${home_dir}/.bashrc",
+    line  => "alias ls='ls -al'",
+    match => '^alias ls=',
+    ensure => present,
+  }
+}
